@@ -151,9 +151,17 @@ impl private::SessionStyle for Repliable {
 
     fn create_session(&self) -> private::SessionParameters {
         let port = self.socket.local_addr().expect("to succeed").port();
-
+        let datagram_protocol = match (
+            self.options.datagrams_authenticated,
+            self.options.datagrams_replay_prevention,
+        ) {
+            (true, false) => "DATAGRAM",
+            (true, true) => "DATAGRAM2",
+            (false, false) => "DATAGRAM3",
+            _ => panic!("should have been caught in `impl private::Subsession for Repliable`"),
+        };
         private::SessionParameters {
-            style: "DATAGRAM".to_string(),
+            style: datagram_protocol.to_string(),
             options: Vec::from_iter([
                 ("PORT".to_string(), port.to_string()),
                 ("HOST".to_string(), "127.0.0.1".to_string()),
@@ -169,6 +177,13 @@ impl private::Subsession for Repliable {
     where
         Self: Sized,
     {
+        match (
+            options.datagrams_authenticated,
+            options.datagrams_replay_prevention,
+        ) {
+            (false, false) => return Err(Error::Protocol(ProtocolError::InvalidState)),
+            _ => {}
+        };
         let socket = UdpSocket::bind(format!("127.0.0.1:{}", options.datagram_port))?;
         let server_address =
             format!("127.0.0.1:{}", options.samv3_udp_port).parse().expect("to succeed");

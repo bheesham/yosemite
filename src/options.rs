@@ -54,6 +54,33 @@ impl fmt::Debug for DestinationKind {
 }
 
 /// Session options.
+///
+/// For `Repliable` datagrams, the following options determine which protocol is used:
+///
+/// * `datagrams_authenticated`;
+/// * `datagrams_replay_prevention`.
+///
+/// The defaults are set up such that `Repliable` datagrams will use the `DATAGRAM1` protocol.
+///
+/// To use `DATAGRAM2`:
+///
+/// ```no_run
+/// yosemite::SessionOptions {
+///     datagrams_authenticated: true,
+///     datagrams_replay_prevention: true,
+///     ..Default::default()
+/// };
+/// ```
+///
+/// To use `DATAGRAM3`:
+///
+/// ```no_run
+/// yosemite::SessionOptions {
+///     datagrams_authenticated: false,
+///     datagrams_replay_prevention: false,
+///     ..Default::default()
+/// };
+/// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SessionOptions {
     /// Nickname.
@@ -324,6 +351,17 @@ pub struct SessionOptions {
     ///
     /// Defaults to `false`.
     pub silent_forward: bool,
+
+    /// Enables authenticated datagrams (either DATAGRAM1 (protocol 17) or DATAGRAM2 (protocol
+    /// 19)).
+    ///
+    /// Defaults to `true`.
+    pub datagrams_authenticated: bool,
+
+    /// Enables replay protection (DATAGRAM2 (protocol 19)).
+    ///
+    /// Defaults to `false`.
+    pub datagrams_replay_prevention: bool,
 }
 
 impl Default for SessionOptions {
@@ -381,6 +419,8 @@ impl Default for SessionOptions {
             samv3_tcp_port: SAMV3_TCP_PORT,
             samv3_udp_port: SAMV3_UDP_PORT,
             silent_forward: false,
+            datagrams_authenticated: true,
+            datagrams_replay_prevention: false,
         }
     }
 }

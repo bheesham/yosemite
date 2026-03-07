@@ -188,15 +188,13 @@ impl SessionController {
                 match parameters.style.as_str() {
                     "PRIMARY" => {}
                     "STREAM" => {}
-                    "DATAGRAM" => {
+                    "DATAGRAM" | "DATAGRAM2" | "DATAGRAM3" => {
                         command += format!(
                             "FROM_PORT={} TO_PORT={} ",
                             self.options.from_port, self.options.to_port,
                         )
                         .as_str();
                     }
-                    "DATAGRAM2" => {}
-                    "DATAGRAM3" => {}
                     "RAW" => {
                         command += format!(
                             "FROM_PORT={} TO_PORT={} PROTOCOL={} HEADER={} ",
