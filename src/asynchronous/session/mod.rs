@@ -38,6 +38,9 @@ use tokio::{io::AsyncWriteExt, net::TcpStream};
 #[cfg(feature = "smol")]
 use smol::{io::AsyncWriteExt, net::TcpStream};
 
+#[cfg(feature = "hyper")]
+mod hyper;
+
 pub mod style;
 
 /// ### SAMv3 session.
