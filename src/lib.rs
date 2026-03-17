@@ -31,6 +31,9 @@ mod proto;
 pub use error::{Error, I2pError, ProtocolError};
 pub use options::{DatagramOptions, DestinationKind, SessionOptions, StreamOptions};
 
+#[cfg(all(feature = "tokio", feature = "smol"))]
+compile_error!("can't use both tokio and smol");
+
 #[cfg(any(feature = "tokio", feature = "smol"))]
 mod asynchronous;
 
