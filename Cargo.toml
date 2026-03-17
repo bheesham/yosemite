@@ -16,6 +16,7 @@ smol = { version = "2.0.2", optional = true }
 thiserror = "1.0.64"
 tokio = { version = "1.40.0", features = ["net", "rt-multi-thread", "io-util"], optional = true }
 tracing = { version = "0.1.40", features = ["log"] }
+hyper = { version = "1", features = ["full"], optional = true }
 
 [dev-dependencies]
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
@@ -25,5 +26,6 @@ tokio = { version = "1.40.0", features = ["net", "macros", "rt-multi-thread", "t
 default = ["tokio"]
 tokio = ["dep:futures", "dep:tokio"]
 smol = ["dep:futures", "dep:smol"]
+hyper = ["dep:hyper"]
 async-extra = []
 sync = []
