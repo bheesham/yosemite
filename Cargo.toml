@@ -21,6 +21,7 @@ hyper = { version = "1", features = ["full"], optional = true }
 [dev-dependencies]
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 tokio = { version = "1.40.0", features = ["net", "macros", "rt-multi-thread", "time"] }
+http-body-util = "0.1.3"
 
 [features]
 default = ["tokio"]
