@@ -22,14 +22,15 @@ use tracing_subscriber::prelude::*;
 //    cargo run --example eepget -- <host>
 //
 // Synchronous eepget:
-//    cargo run --example hyper --no-default-features --features hyper,tokio -- \
+//    cargo run --example hyper --no-default-features --features tokio-hyper -- \
 //    'http://udhdrtrcetjm5sxzskjyr5ztpeszydbh4dpl3pl4utgqqw2v4jna.b32.i2p/hosts.txt'
 
-#[cfg(all(feature = "tokio", not(feature = "sync")))]
+#[cfg(feature = "tokio", not(feature = "sync"))]
 #[tokio::main]
 async fn main() {
     use http_body_util::{BodyExt, Empty};
     use hyper::{body::Bytes, Request};
+    use hyper_util::rt::tokio::TokioIo;
     use yosemite::{style::Stream, Session, SessionOptions};
 
     tracing_subscriber::registry()
@@ -48,7 +49,7 @@ async fn main() {
     tracing::debug!("connecting to {host}");
     let stream = session.connect(&host).await.unwrap();
     tracing::debug!("connected");
-    let (mut sender, conn) = hyper::client::conn::http1::handshake(stream)
+    let (mut sender, conn) = hyper::client::conn::http1::handshake(TokioIo::new(stream))
         .await
         .expect("could not establish http connection");
     tokio::task::spawn(async move {
@@ -73,10 +74,11 @@ async fn main() {
     }
 }
 
-#[cfg(all(feature = "smol", not(feature = "sync")))]
+#[cfg(feature = "smol", not(feature = "sync"))]
 async fn main_smol() {
     use http_body_util::{BodyExt, Empty};
     use hyper::{body::Bytes, Request};
+    use smol_hyper::rt::FuturesIo;
     use yosemite::{style::Stream, Session, SessionOptions};
 
     let url = std::env::args().nth(1).expect("url");
@@ -90,7 +92,7 @@ async fn main_smol() {
     tracing::debug!("connecting to {host}");
     let stream = session.connect(&host).await.unwrap();
     tracing::debug!("connected");
-    let (mut sender, conn) = hyper::client::conn::http1::handshake(stream)
+    let (mut sender, conn) = hyper::client::conn::http1::handshake(FuturesIo::new(stream))
         .await
         .expect("could not establish http connection");
     let _ = smol::spawn(async move {
@@ -115,7 +117,7 @@ async fn main_smol() {
     }
 }
 
-#[cfg(all(feature = "smol", not(feature = "sync")))]
+#[cfg(feature = "smol", not(feature = "sync"))]
 fn main() {
     tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
